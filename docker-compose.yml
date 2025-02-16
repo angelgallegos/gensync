@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./operations/docker
+      dockerfile: Dockerfile
+    container_name: genpo-test
+    volumes:
+      - ./app:/var/www/html
+      - ./data:/var/www/data
+    ports:
+      - "8080:80"
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+    depends_on:
+      - mysql
+    networks:
+      - laravel-net
+
+  mysql:
+    image: mysql:8
+    container_name: laravel-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: genpo_test
+      MYSQL_USER: genpo
+      MYSQL_PASSWORD: genpo
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - laravel-net
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+
+networks:
+  laravel-net:
